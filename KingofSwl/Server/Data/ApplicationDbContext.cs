@@ -1,5 +1,4 @@
-﻿using Duende.IdentityServer.EntityFramework.Options;
-//using IdentityServer4.EntityFramework.Options;
+﻿using IdentityServer4.EntityFramework.Options;
 using KingofSwl.Server.Models;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;

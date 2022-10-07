@@ -21,8 +21,7 @@ namespace KingofSwl.Server
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    //webBuilder.UseUrls("http://*:37795;https://pclh.mypokemon.top:37792");
-                    webBuilder.UseUrls("http://*:37795;");
+                    webBuilder.UseUrls("http://*:37793;https://pclh.mypokemon.top:37792");
                 })
             ;
     }

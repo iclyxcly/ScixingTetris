@@ -13,17 +13,17 @@ namespace ScixingTetrisCore
     // 生成位置确定一下
     public class TetrisGameBoard : ITetrisGameBoard
     {
-        public byte[][] Field { get; protected set; }
+        public byte[][] Field { get; private set; }
         public int Height { get => Field.Length; }
         public int Width { get => Field[0].Length; }
         public int ShowHeight { get; set; }
         public int[] ColHeight { get; set; }
-        public ITetrisRule TetrisRule { get; protected set; }
+        public ITetrisRule TetrisRule { get; private set; }
 
-        //public Queue<ITetrisMino> NextQueue => throw new NotImplementedException(); 
+        //public Queue<ITetrisMino> NextQueue => throw new NotImplementedException();
         public Queue<ITetrisMino> NextQueue { get; } = new();
 
-        public bool IsDead => false;
+        public bool IsDead => throw new NotImplementedException();
 
         // 对于单方块场地
         public ITetrisMinoStatus TetrisMinoStatus;
@@ -34,16 +34,12 @@ namespace ScixingTetrisCore
         /// 生成器 要在这里吗（
         /// </summary>
         public ITetrisMinoGenerator TetrisMinoGenerator;
-        /// <summary>
-        /// 垃圾行储存
-        /// </summary>
-        public List<int> GarbageStack { get; } = new();
 
         //public IFieldCheck FieldCheck => throw new NotImplementedException();
 
 
         // 此处还欠考虑
-        public int B2B { get; set; } = -1;
+        public int B2B { get; set; }
         public int Combo { get; set; }
 
         public (int X, int Y) DefaultPos = (20, 3);
@@ -51,7 +47,7 @@ namespace ScixingTetrisCore
         public TetrisGameBoard(int Width = 10, int Height = 40, int ShowHeight = 20, ITetrisRule tetrisRule = null, ITetrisMinoGenerator tetrisMinoGenerator = null)
         {
             // 赋予规则
-            TetrisRule = tetrisRule ?? Rule.TetrisRule.GuildLine;
+            TetrisRule = tetrisRule ?? GuildLineRule.Rule;
             TetrisMinoGenerator = tetrisMinoGenerator ?? new Bag7Generator<TetrisMino>();
             Field = new byte[Height][];
             for (int i = 0; i < Height; ++i)
@@ -66,99 +62,12 @@ namespace ScixingTetrisCore
         }
 
         // 加入接口
-        public virtual void GameStart()
+        public void GameStart()
         {
-            NextQueue.Clear();
-            for (int i = 0; i < 7; i++)
-            {
-                NextQueue.Enqueue(TetrisMinoGenerator.GetNextMino());
-            }
             SpawnNewPiece();
         }
-        protected ClearMessage CountClearLines()
+        public int TryClearLines()
         {
-            ClearMessage count = new ClearMessage();
-            bool[] clearFlag = new bool[Height];
-            count.ClearFlag = clearFlag;
-            //List<byte> clearFlag = new();
-            for (int i = 0; i < Height; ++i)
-            {
-
-                for (int j = 0; j < Width; ++j)
-                {
-                    if (Field[i][j] == 0)
-                    {
-                        clearFlag[i] = true;
-                        ++count.ClearRows;
-                        break;
-                    }
-                }
-            }
-            return count;
-        }
-        //private List<byte> CountClearLines()
-        //{
-        //    //bool[] clearFlag = new bool[Height];
-        //    List<byte> clearFlag = new();
-        //    for (int i = 0; i < Height; ++i)
-        //    {
-  
-        //        for (int j = 0; j < Width; ++j)
-        //        {
-        //            if (Field[i][j] == 0)
-        //            {
-        //                //clearFlag[i] = true;
-        //                clearFlag.Add(i);
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    return clearFlag;
-        //}
-        //private void ClearLine(List<bool> clearFlag)
-        //{
-        //    int idx = 0;
-        //    for (int i = 0, j = 0; i < Height; ++i, ++j)
-        //    {
-        //        while (j < Height && clearFlag[idx] == j)
-        //        {
-        //            ++j;
-        //            idx++;
-        //        }
-        //        if (j >= Height)
-        //        {
-        //            Field[i] = new byte[Width];
-        //        }
-        //        else
-        //        {
-        //            Field[i] = Field[j];
-        //        }
-
-        //    }
-        //}
-        protected void ClearLine(bool[] clearFlag)
-        {
-            for (int i = 0, j = 0; i < Height; ++i, ++j)
-            {
-                while (j < Height && clearFlag[j])
-                {
-                    ++j;
-                }
-                if (j >= Height)
-                {
-                    Field[i] = new byte[Width];
-                }
-                else
-                {
-                    Field[i] = Field[j];
-                }
-
-            }
-        }
-
-        public virtual ClearMessage TryClearLines()
-        {
-            ClearMessage message = new ();
             int cnt = 0;
             // 限制一下搜索高度
             //List<int> clearidx = new List<int>();
@@ -171,7 +80,6 @@ namespace ScixingTetrisCore
                     if (Field[i][j] == 0)
                     {
                         flag = false;
-                        break;
                     }
                 }
                 if (flag) { cnt++; clearFlag[i] = true; }
@@ -179,8 +87,6 @@ namespace ScixingTetrisCore
             
             if (cnt > 0) Combo++;
             else Combo = 0;
-            // 以上位消行检测
-
             bool isTspin = false;
             // 可能要改一下
             if (cnt > 0 && TetrisMinoStatus.LastRotation && TetrisMinoStatus.TetrisMino.MinoType == MinoType.SC_T)
@@ -194,9 +100,6 @@ namespace ScixingTetrisCore
                 if (spinCnt >= 3) Console.WriteLine("Tspin");
             }
             if (cnt == 4 || isTspin) B2B++;
-
-
-            // 以下为消行行为
             for (int i = 0, j = 0; i < Height; ++i, ++j)
             {
                 while (j < Height && clearFlag[j])
@@ -213,13 +116,8 @@ namespace ScixingTetrisCore
                 }
 
             }
-
-            message.ClearRows = cnt;
-            message.B2B = B2B;
-            message.ClearType = isTspin ? ClearType.Tspin : ClearType.None;
-            message.Combo = Combo;
-            message.IsPerfectClear = IsPrefect();
-            return message;
+            
+            return cnt;
         }
 
         /// <summary>
@@ -270,17 +168,15 @@ namespace ScixingTetrisCore
             }
         }
 
-        public virtual bool LockMino()
+        public bool LockMino()
         {
             //if(TetrisRule)
-
             var minoList = TetrisMinoStatus.GetMinoFieldListInBoard();
             // 要不不检查了（？
             // 断言此时的场地和方块是ok的
-            foreach (var (X, Y) in minoList)
+            foreach (var pos in minoList)
             {
-                //Field[pos.X][pos.Y] = 1;
-                Field[X][Y] = (byte)(TetrisMinoStatus.TetrisMino.MinoType + 1);
+                Field[pos.X][pos.Y] = 1;
             }
             TryClearLines();
             SpawnNewPiece();
@@ -295,22 +191,7 @@ namespace ScixingTetrisCore
             }
             return false;
         }
-        public bool IsCellFreeWithMino(int x, int y)
-        {
-            bool flag = true;
-            if (TetrisMinoStatus != null)
-            {
-                foreach (var pos in TetrisMinoStatus?.GetMinoFieldListInBoard())
-                {
-                    if (pos.X == x && pos.Y == y)
-                    {
-                        flag = false;
-                        break;
-                    }
-                }
-            }
-            return flag && IsCellFree(x, y);
-        }
+
         public bool LeftRotation()
         {
             return TetrisRule.RotationSystem.LeftRotation(this, TetrisMinoStatus).isSuccess;
@@ -323,9 +204,7 @@ namespace ScixingTetrisCore
 
         public bool _180Rotation()
         {
-            return TetrisRule.RotationSystem._180Rotation(this, TetrisMinoStatus).isSuccess;
-
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public bool MoveLeft()
@@ -352,17 +231,6 @@ namespace ScixingTetrisCore
             return false;
         }
 
-        public bool MoveUp()
-        {
-            TetrisMinoStatus.MoveTop();
-            if (TetrisRule.CheckMinoOk(this, TetrisMinoStatus))
-            {
-                TetrisMinoStatus.LastRotation = false;
-                return true;
-            }
-            TetrisMinoStatus.MoveBottom();
-            return false;
-        }
         public bool SoftDrop()
         {
             TetrisMinoStatus.MoveBottom();
@@ -399,7 +267,6 @@ namespace ScixingTetrisCore
             {
                 HoldMino = TetrisMinoStatus.TetrisMino;
                 SpawnNewPiece();
-                
             }
             else
             {
@@ -407,77 +274,20 @@ namespace ScixingTetrisCore
                 //TetrisMinoStatus.Position = (19, 3);
                 TetrisMinoStatus.Position = DefaultPos;
                 TetrisMinoStatus.Stage = 0;
-                SoftDrop();
             }
             return true;
         }
 
-        public virtual bool SpawnNewPiece()
+        public bool SpawnNewPiece()
         {
             // 先简略来一个（ 后续要改 要考虑方块用什么 需不需要接口 要看看成不成功
             //TetrisMinoStatus = new TetrisMinoStatus { Position = (19, 3), Stage = 0, TetrisMino = TetrisMinoGenerator.GetNextMino() };
             //TetrisMinoStatus = new TetrisMinoStatus { Position = (19, 3), Stage = 0, TetrisMino = NextQueue.Dequeue() };
             TetrisMinoStatus = new TetrisMinoStatus { Position = DefaultPos, Stage = 0, TetrisMino = NextQueue.Dequeue() };
-            // 这个撕烤 根据不同的规则生成
-            NextQueue.Enqueue(TetrisMinoGenerator.GetNextMino());
+
             // 针对io 立即下降一格
-            //SoftDrop();
+            SoftDrop();
             return true;
-        }
-
-        public virtual void ResetGame()
-        {
-            for (int i = 0; i < Height; ++i)
-            {
-                for (int j = 0; j < Width; j++)
-                {
-                    Field[i][j] = 0;
-                }
-            }
-            for (int i = 0; i < Width; i++)
-            {
-                ColHeight[i] = 0;
-            }
-            HoldMino = null;
-            //for (int i = 0; i < ColHeight.Length; i++)
-            //{
-            //    ColHeight[i] = 0;
-            //}
-            TetrisMinoGenerator.Reset();
-            GarbageStack.Clear();
-            B2B = -1;
-            Combo = 0;
-            GameStart();
-            //ColHeight = new int[Width];
-        }
-
-        public virtual void ReceiveGarbage(List<int> garbages)
-        {
-            for (int i = 0; i < garbages.Count; i++)
-            {
-                GarbageStack.Add(garbages[i]);
-            }
-        }
-
-        public virtual void AddField(List<byte[]> field)
-        {
-            for (int i = Height - field.Count - 1; i >= 0 ; --i)
-            {
-                Field[i + field.Count] = Field[i];
-            }
-            for (int i = 0; i < field.Count && i < Height; i++)
-            {
-                Field[i] = field[i];    
-            }
-            //for (int i = 0; i < ColHeight.Length; i++)
-            //{
-            //    ColHeight[i] += field.Count;
-            //}
-            //throw new NotImplementedException();
-        }
-        public virtual bool IsPrefect()
-        {
-            return !Field[0].Any(s => s != 0);
         }
     }
 }

@@ -32,8 +32,8 @@ namespace ScixingTetrisCore.Rule
         public int[] ClearRowAttack { get; protected set; }
         public int PerfectClearAttack { get; protected set; }
 
-        public abstract List<int> DamageCalc(ClearMessage attackMessage);
-        public abstract int DamageCalcSimple(ClearMessage attackMessage);
+        public abstract List<int> DamageCalc(AttackMessage attackMessage);
+        public abstract int DamageCalcSimple(AttackMessage attackMessage);
 
         //public Func<int, int> DamageCalc;
     }
@@ -42,15 +42,15 @@ namespace ScixingTetrisCore.Rule
     {
         public static readonly AttackRule Guideline = new ARGuildLine
         {
-            ComboTable = new[] { 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, -1 },
+            ComboTable = new[] { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5, 5, -1 },
             TspinAttack = new[] { 0, 2, 4, 6 },
             MiniTspinAttack = new[] { 0, 0, 2, 6 },
-            ClearRowAttack = new[] { 0, 0, 1, 2, 4 },
+            ClearRowAttack = new[] { 0, 1, 2, 4 },
             PerfectClearAttack = 6,
             //DamageCale
         };
         // 要不要传出总伤害 因为有时候并不需要
-        public override List<int> DamageCalc(ClearMessage attackMessage)
+        public override List<int> DamageCalc(AttackMessage attackMessage)
         {
             List<int> res = new List<int>();
             if (attackMessage.IsPerfectClear) res.Add(PerfectClearAttack);
@@ -61,11 +61,11 @@ namespace ScixingTetrisCore.Rule
                 case ClearType.None:
                     atk += ClearRowAttack[attackMessage.ClearRows];
                     break;
-                case ClearType.Spin:
+                case ClearType.Tspin:
                     atk += TspinAttack[attackMessage.ClearRows];
                     break;
-                case ClearType.Minispin:
-                    atk += MiniTspinAttack[attackMessage.ClearRows];
+                case ClearType.MiniTspin:
+                    atk += ClearRowAttack[attackMessage.ClearRows];
                     break;
                 default:
                     break;
@@ -75,7 +75,7 @@ namespace ScixingTetrisCore.Rule
             return res;
         }
 
-        public override int DamageCalcSimple(ClearMessage attackMessage)
+        public override int DamageCalcSimple(AttackMessage attackMessage)
         {
             int atk = 0;
             if (attackMessage.IsPerfectClear) atk += PerfectClearAttack;
@@ -88,7 +88,7 @@ namespace ScixingTetrisCore.Rule
                 case ClearType.Tspin:
                     atk += TspinAttack[attackMessage.ClearRows];
                     break;
-                case ClearType.Minispin:
+                case ClearType.MiniTspin:
                     atk += ClearRowAttack[attackMessage.ClearRows];
                     break;
                 default:
@@ -99,17 +99,4 @@ namespace ScixingTetrisCore.Rule
         }
     }
 
-
-    public class EPlusAttackRule : ARGuildLine
-    {
-        public override List<int> DamageCalc(ClearMessage attackMessage)
-        {
-            return base.DamageCalc(attackMessage);
-        }
-
-        public override int DamageCalcSimple(ClearMessage attackMessage)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }

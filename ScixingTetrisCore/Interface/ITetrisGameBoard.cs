@@ -12,7 +12,7 @@ namespace ScixingTetrisCore.Interface
     public interface ITetrisGameBoard: ITetrisRuleBoard
     {
         
-        // 需要吗内联吗
+        // 需要吗
         /// <summary>
         /// Next表
         /// </summary>
@@ -33,7 +33,6 @@ namespace ScixingTetrisCore.Interface
         /// </summary>
         /// <returns></returns>
         bool _180Rotation();
-        
         /// <summary>
         /// 左移
         /// </summary>
@@ -44,11 +43,6 @@ namespace ScixingTetrisCore.Interface
         /// </summary>
         /// <returns></returns>
         bool MoveRight();
-        /// <summary>
-        /// 上移
-        /// </summary>
-        /// <returns></returns>
-        bool MoveUp();
         /// <summary>
         /// 软降
         /// </summary>
@@ -73,12 +67,5 @@ namespace ScixingTetrisCore.Interface
         /// <returns></returns>
         bool SpawnNewPiece();
 
-        bool IsCellFreeWithMino(int x, int y);
-
-        void ResetGame();
-
-        void ReceiveGarbage(List<int> garbages);
-        //void AddField(List<byte[]> field);
-        
     }
 }

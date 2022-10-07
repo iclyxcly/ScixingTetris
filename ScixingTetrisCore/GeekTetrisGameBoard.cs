@@ -394,26 +394,6 @@ namespace ScixingTetrisCore
             return true;
         }
 
-        public bool IsCellFreeWithMino(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetGame()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReceiveGarbage(List<int> garbages)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool MoveUp()
-        {
-            throw new NotImplementedException();
-        }
-
         public StringBuilder res { get; set; } = new StringBuilder();
 
         public string GetRes  { get => res.ToString()[1..]; set => res = new StringBuilder("N" + value); }

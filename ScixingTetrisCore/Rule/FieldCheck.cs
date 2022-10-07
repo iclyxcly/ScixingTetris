@@ -57,7 +57,5 @@ namespace ScixingTetrisCore.Rule
             return tetrisBoard.IsCellFree(x, y);
         }
     }
-
-    
 }
 

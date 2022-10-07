@@ -32,6 +32,7 @@ namespace ScixingTetrisCore.Interface
         /// <returns></returns>
         bool IsCellFree(int x, int y);
 
+
         /// <summary>
         /// 锁定方块
         /// </summary>

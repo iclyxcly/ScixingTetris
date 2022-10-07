@@ -20,25 +20,18 @@ namespace ScixingTetrisCore
         /// </summary>
         public ITetrisMino TetrisMino { get; set; }
         public bool LastRotation { get; set; }
-        public int Kickcnt { get; set; }
 
         // 内部坐标
         protected int _x, _y;
         public void LeftRoll()
         {
             Stage += 3;
-            Stage &= 3;
+            Stage %= 4;
         }
         public void RightRoll()
         {
             Stage++;
-            Stage &= 3;
-        }
-        public void _180Roll()
-        {
-            Stage += 2;
-            //Stage %= 4;
-            Stage &= 3;
+            Stage %= 4;
         }
         public void MoveLeft(int distance = 1)
         {
@@ -66,7 +59,7 @@ namespace ScixingTetrisCore
             }
             return res;
         }
-        
+
         public ITetrisMinoStatus Clone()
         {
             var res = new TetrisMinoStatus();
@@ -75,7 +68,5 @@ namespace ScixingTetrisCore
             res.Stage = this.Stage;
             return res;
         }
-
-        
     }
 }

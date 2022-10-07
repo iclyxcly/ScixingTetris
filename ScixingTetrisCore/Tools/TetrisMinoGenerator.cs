@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using ScixingTetrisCore.Interface;
 namespace ScixingTetrisCore.Tools
 {
-    public class TetrisMinoGenerator<TTetrisMino> : ITetrisMinoGenerator where TTetrisMino : ITetrisMino, new()
+    public class TetrisMinoGenerator<TTetrisMino> : ITetrisMinoGenerator where TTetrisMino : ITetrisMino
     {
         protected Random rnd;
         public IEnumerator<ITetrisMino> NextQueue;
-        private int _seed;
         protected TetrisMinoGenerator(int? seed = null)
         {
             rnd = seed == null ? new Random() : new Random(seed.Value);
@@ -26,16 +25,6 @@ namespace ScixingTetrisCore.Tools
             NextQueue.MoveNext();
             var res = NextQueue.Current;
             return res;
-        }
-
-        public ITetrisMino[] GetMinoList()
-        {
-            return new TTetrisMino().GetMinoList();
-        }
-
-        public virtual void Reset(bool refreshSeed = true)
-        {
-            throw new NotImplementedException();
         }
         //public abstract IEnumerator<ITetrisMino> GetNextMino();
     }
@@ -67,17 +56,8 @@ namespace ScixingTetrisCore.Tools
                 foreach (var res in list.OrderBy(s => rnd.Next()))
                 {
                     yield return res;
-                    //yield return list[1];
                 }
             }
-        }
-        public override void Reset(bool refreshSeed = true)
-        {
-            if (!refreshSeed)
-            {
-
-            }
-            NextQueue = GetNextQueue();
         }
     }
     public class GeekGenerator<TTetrisMino> : TetrisMinoGenerator<TTetrisMino> where TTetrisMino : ITetrisMino, new()

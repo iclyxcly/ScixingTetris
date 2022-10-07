@@ -1,5 +1,4 @@
-﻿using ScixingTetrisCore.Rule;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,12 +17,6 @@ namespace ScixingTetrisCore.Interface
         /// 旋转系统
         /// </summary>
         IRotationSystem RotationSystem { get; }
-        IGarbageGenerator GarbageGenerator { get; }
-        ITetrisMinoGenerator MinoGenerator { get; }
-
-        SpinB2BRule SpinRule { get; }
-        GarbageRule GarbageRule { get; }
-
         ///// <summary>
         ///// 攻击表（？ 感觉要换一下
         ///// </summary>
@@ -34,6 +27,6 @@ namespace ScixingTetrisCore.Interface
 
         bool CheckMinoOk(ITetrisBoard tetrisBoard, ITetrisMinoStatus tetrisMinoStatus);
         bool CheckPostionOk(ITetrisBoard tetrisBoard, int x, int y);
-        List<int> GetAttack(ClearMessage attackMessage);
+        List<int> GetAttack(AttackMessage attackMessage);
     }
 }

@@ -1,6 +1,4 @@
-using Blazored.LocalStorage;
 using KingofSwl.Server.Data;
-using KingofSwl.Server.Hubs;
 using KingofSwl.Server.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -42,28 +40,14 @@ namespace KingofSwl.Server
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
-            services.AddBlazoredLocalStorage();   // local storage
-            services.AddBlazoredLocalStorage(config =>
-                config.JsonSerializerOptions.WriteIndented = true);  // local storage
-            services.AddSignalR();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
-
-           
-            //services.AddControllersWithViews();
-            //services.AddRazorPages();
-            services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseResponseCompression();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -77,21 +61,20 @@ namespace KingofSwl.Server
                 app.UseHsts();
             }
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            //app.UseIdentityServer();
-            //app.UseAuthentication();
-            //app.UseAuthorization();
+            app.UseIdentityServer();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHub<KosHub>("/koshub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

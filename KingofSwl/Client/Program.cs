@@ -9,10 +9,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-using MudBlazor;
-using Blazored.LocalStorage;
-using MudBlazor.Services;
-
 namespace KingofSwl.Client
 {
     public class Program
@@ -27,11 +23,9 @@ namespace KingofSwl.Client
 
             // Supply HttpClient instances that include access tokens when making requests to the server project
             builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("KingofSwl.ServerAPI"));
-            builder.Services.AddMudServices();
+
             builder.Services.AddApiAuthorization();
-            builder.Services.AddBlazoredLocalStorage();   // local storage
-            builder.Services.AddBlazoredLocalStorage(config =>
-                config.JsonSerializerOptions.WriteIndented = true);  // local storage
+
             await builder.Build().RunAsync();
         }
     }

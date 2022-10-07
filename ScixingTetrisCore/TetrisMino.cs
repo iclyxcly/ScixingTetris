@@ -309,21 +309,6 @@ namespace ScixingTetrisCore
         public int Height { get; private set; }
         public MinoType MinoType { get; private set; }
 
-        public static TetrisMino GetTetrisMino(MinoType minoType)
-        {
-            return minoType switch
-            {
-                MinoType.SC_I => I,
-                MinoType.SC_J => J,
-                MinoType.SC_L => L,
-                MinoType.SC_O => O,
-                MinoType.SC_S => S,
-                MinoType.SC_T => T,
-                MinoType.SC_Z => Z,
-                _ => I
-            };
-        }
-
         public static readonly TetrisMino I = new()
         {
             _field = new (int, int)[][]
@@ -533,10 +518,10 @@ namespace ScixingTetrisCore
                 I,
                 O,
                 T,
-                L,
                 J,
-                S,
+                L,
                 Z,
+                S,
             };
         }
         public static ITetrisMino[] GetMinoListS()
@@ -546,10 +531,10 @@ namespace ScixingTetrisCore
                 I,
                 O,
                 T,
-                L,
                 J,
-                S,
+                L,
                 Z,
+                S,
             };
         }
     }
