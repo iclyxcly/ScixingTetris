@@ -32,8 +32,7 @@ namespace TETR.IO.Bot
     public class BotSetting
     {
         public int NextCnt { get; set; } = 6;
-        public int Level { get; set; } = 8;
-        public int BPM { get; set; } = 200;
+        public double PPS { get; set; } = 3;
         //public bool AutoLevel { get; set; } = true;
 
     }
@@ -42,12 +41,10 @@ namespace TETR.IO.Bot
         static Queue<MinoType> _nextQueue = new();
         static TetrisGameBoard _IOBoard = new(ShowHeight: 22);
         static int _garbage = 0;
+        static int pieces;
         static object _lockQueue = new();
         static object _lockBoard = new();
         static BotSetting _botSetting = new BotSetting();
-
-        static DateTime _startTime;
-        static int _nowIdx = 0;
         public IOBot()
         {
 
@@ -60,21 +57,22 @@ namespace TETR.IO.Bot
                 var nextQueue = await req.Bind<string[]>();
                 AddNext(nextQueue);
                 _IOBoard.GameStart();
-                Console.WriteLine("新的一局开始了！");
-                Console.WriteLine($"序列为！{string.Join(",", nextQueue[..20])}...");
+               // Console.WriteLine("新的一局开始了！");
+               // Console.WriteLine($"序列为！{string.Join(",", nextQueue[..20])}...");
 
             });
 
             Post("/endGame", async (req, res) =>
             {
-                Console.WriteLine("游戏结束！");
+                pieces = 0;
+              //  Console.WriteLine("游戏结束！");
             });
 
             Post("/newPieces", async (req, res) =>
             {
                 var nextQueue = await req.Bind<string[]>();
                 AddNext(nextQueue);
-                Console.WriteLine("添加新序列");
+              //  Console.WriteLine("添加新序列");
             });
             Get("/GetPieces", async (req, res) =>
             {
@@ -101,12 +99,12 @@ namespace TETR.IO.Bot
                 //}
 
                 //resetBorad(board);
-                Console.WriteLine("重置地图");
+               // Console.WriteLine("重置地图");
             });
             Post("/pendingGarbage", async (req, res) =>
             {
                 var nextQueue = req.BindAndValidate<string[]>();
-                Console.WriteLine("重置游戏红条");
+              //  Console.WriteLine("重置游戏红条");
             });
         }
 
@@ -114,8 +112,6 @@ namespace TETR.IO.Bot
         {
             _IOBoard = new();
             _garbage = 0;
-            //_startTime = DateTime.Now;
-            _nowIdx = 0;
             try
             {
                 _botSetting = JsonSerializer.Deserialize<BotSetting>(System.IO.File.ReadAllText("TetrSetting.json"));
@@ -159,7 +155,6 @@ namespace TETR.IO.Bot
         {
 
             if (board is null) return;
-
             _garbage = board.RootElement.GetProperty("garbage").GetInt32();
             JsonElement data = board.RootElement.GetProperty("board");
             lock (_lockBoard)
@@ -175,7 +170,6 @@ namespace TETR.IO.Bot
 
         }
 
-
         private MoveResult GetMove(int garbage)
         {
             int[] field1 = new int[24];
@@ -188,10 +182,10 @@ namespace TETR.IO.Bot
                 }
 
             }
-
+            ++pieces;
             var path = ZZZTOJCore.TetrisAI(field2, field1, 10, 22, _IOBoard.B2B,
                     _IOBoard.Combo, _IOBoard.NextQueue.Take(_botSetting.NextCnt + 1).Select(s => s.Name[0]).ToArray(), (_IOBoard.HoldMino == null ? ' ' : _IOBoard.HoldMino.Name[0]),
-                    true, _IOBoard.TetrisMinoStatus.TetrisMino.Name[0], 3, 19 - _IOBoard.TetrisMinoStatus.Position.X, 0, true, false, garbage, new[] { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, -1 }, _botSetting.NextCnt, _botSetting.Level, 0);
+                    true, _IOBoard.TetrisMinoStatus.TetrisMino.Name[0], 3, 19 - _IOBoard.TetrisMinoStatus.Position.X, 0, true, false, garbage, new[] { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, -1 }, _botSetting.NextCnt, _botSetting.PPS, pieces, TetrisGameBoard.count, 0);
             string resultpath = Marshal.PtrToStringAnsi(path);
             //Console.WriteLine(resultpath);
             MoveResult moveResult = new MoveResult();
@@ -259,19 +253,6 @@ namespace TETR.IO.Bot
                 }
                 if (move == 'V') break;
             }
-            if (_nowIdx == 0)
-            {
-                _startTime = DateTime.Now;
-            }
-            _nowIdx++;
-            TimeSpan hopeTime = TimeSpan.FromSeconds(60.0 / _botSetting.BPM * _nowIdx);
-            //Console.WriteLine("延时" + (_startTime + hopeTime - DateTime.Now).TotalMilliseconds + "毫秒");
-            if (DateTime.Now < _startTime + hopeTime)
-            {
-                Task.Delay( _startTime + hopeTime - DateTime.Now).Wait();
-            }
-            
-            //_IOBoard.PrintBoard(WithMino:false);
             return moveResult;
         }
     }

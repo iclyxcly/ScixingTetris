@@ -19,7 +19,7 @@ namespace ScixingTetrisCore
         public int ShowHeight { get; set; }
         public int[] ColHeight { get; set; }
         public ITetrisRule TetrisRule { get; private set; }
-
+        public static int count;   
         //public Queue<ITetrisMino> NextQueue => throw new NotImplementedException();
         public Queue<ITetrisMino> NextQueue { get; } = new();
 
@@ -69,6 +69,7 @@ namespace ScixingTetrisCore
         public int TryClearLines()
         {
             int cnt = 0;
+            count = 0;
             // 限制一下搜索高度
             //List<int> clearidx = new List<int>();
             bool[] clearFlag = new bool[Height]; 
@@ -77,6 +78,7 @@ namespace ScixingTetrisCore
                 bool flag = true;
                 for (int j = 0; j < Width; ++j)
                 {
+                    count += Field[i][j];
                     if (Field[i][j] == 0)
                     {
                         flag = false;
@@ -97,7 +99,7 @@ namespace ScixingTetrisCore
                 spinCnt += TetrisRule.CheckPostionOk(this, TetrisMinoStatus.Position.X, TetrisMinoStatus.Position.Y + 2) ? 0 : 1;
                 spinCnt += TetrisRule.CheckPostionOk(this, TetrisMinoStatus.Position.X + 2, TetrisMinoStatus.Position.Y + 2) ? 0 : 1;
                 if (spinCnt >= 3) isTspin = true;
-                if (spinCnt >= 3) Console.WriteLine("Tspin");
+                //if (spinCnt >= 3) Console.WriteLine("Tspin");
             }
             if (cnt == 4 || isTspin) B2B++;
             for (int i = 0, j = 0; i < Height; ++i, ++j)
@@ -116,7 +118,6 @@ namespace ScixingTetrisCore
                 }
 
             }
-            
             return cnt;
         }
 
@@ -178,6 +179,7 @@ namespace ScixingTetrisCore
             {
                 Field[pos.X][pos.Y] = 1;
             }
+            PrintBoard(true, 1, 1);
             TryClearLines();
             SpawnNewPiece();
             return true;
