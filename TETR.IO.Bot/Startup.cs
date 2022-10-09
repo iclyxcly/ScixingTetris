@@ -28,7 +28,7 @@ namespace TETR.IO.Bot
             services.AddRazorPages();
             services.AddCarter();
             // options => {
-            //     options.OpenApi.ServerUrls = new[] { "http://127.0.0.1:47327" };
+            //     options.OpenApi.ServerUrls = new[] { "http://127.0.0.1:47326" };
             // }
         }
 

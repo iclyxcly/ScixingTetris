@@ -30,7 +30,7 @@ namespace TETR.IO.Bot
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://*:47327");
+                    webBuilder.UseUrls("http://*:47326");
                 });
     }
 }
