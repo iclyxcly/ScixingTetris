@@ -102,6 +102,8 @@ namespace ScixingTetrisCore
                 //if (spinCnt >= 3) Console.WriteLine("Tspin");
             }
             if (cnt == 4 || isTspin) B2B++;
+            else if (cnt == 0) ;
+            else B2B = 0;
             for (int i = 0, j = 0; i < Height; ++i, ++j)
             {
                 while (j < Height && clearFlag[j])
@@ -179,7 +181,6 @@ namespace ScixingTetrisCore
             {
                 Field[pos.X][pos.Y] = 1;
             }
-            PrintBoard(true, 1, 1);
             TryClearLines();
             SpawnNewPiece();
             return true;
