@@ -19,7 +19,8 @@ namespace ScixingTetrisCore
         public int ShowHeight { get; set; }
         public int[] ColHeight { get; set; }
         public ITetrisRule TetrisRule { get; private set; }
-        public static int count;   
+        public static int count;
+        public static bool IsMinoHeightIncreased;
         //public Queue<ITetrisMino> NextQueue => throw new NotImplementedException();
         public Queue<ITetrisMino> NextQueue { get; } = new();
 
@@ -42,7 +43,7 @@ namespace ScixingTetrisCore
         public int B2B { get; set; }
         public int Combo { get; set; }
 
-        public (int X, int Y) DefaultPos = (20, 3);
+        public (int X, int Y) DefaultPos = (20, 3); // known issue
         // 此处还欠考虑
         public TetrisGameBoard(int Width = 10, int Height = 40, int ShowHeight = 20, ITetrisRule tetrisRule = null, ITetrisMinoGenerator tetrisMinoGenerator = null)
         {
@@ -72,7 +73,9 @@ namespace ScixingTetrisCore
             count = 0;
             // 限制一下搜索高度
             //List<int> clearidx = new List<int>();
-            bool[] clearFlag = new bool[Height]; 
+            bool[] clearFlag = new bool[Height];
+            /*if (Field[20][4] != 0) IsMinoHeightIncreased = true; // might be the resolve of known issue but untested
+            else IsMinoHeightIncreased = false;*/
             for (int i = 0; i < Height; ++i)
             {
                 bool flag = true;

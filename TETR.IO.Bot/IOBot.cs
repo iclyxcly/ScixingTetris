@@ -39,7 +39,7 @@ namespace TETR.IO.Bot
     public class IOBot : CarterModule
     {
         static Queue<MinoType> _nextQueue = new();
-        static TetrisGameBoard _IOBoard = new(ShowHeight: 22);
+        static TetrisGameBoard _IOBoard = new(ShowHeight: 21); // known issue
         static int _garbage = 0;
         static bool isEnded;
         static object _lockQueue = new();
@@ -184,10 +184,11 @@ namespace TETR.IO.Bot
             }
             var path = ZZZTOJCore.TetrisAI(field2, field1, 10, 22, _IOBoard.B2B,
                     _IOBoard.Combo, _IOBoard.NextQueue.Take(_botSetting.NextCnt + 1).Select(s => s.Name[0]).ToArray(), (_IOBoard.HoldMino == null ? ' ' : _IOBoard.HoldMino.Name[0]),
-                    true, _IOBoard.TetrisMinoStatus.TetrisMino.Name[0], 3, 19 - _IOBoard.TetrisMinoStatus.Position.X, 0, true, true, garbage, new[] { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, -1 }, _botSetting.NextCnt, _botSetting.PPS, isEnded, TetrisGameBoard.count, 0);
+                    true, _IOBoard.TetrisMinoStatus.TetrisMino.Name[0], 3, 1, 0, true, true, garbage, new[] { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, -1 }, _botSetting.NextCnt, _botSetting.PPS, isEnded, TetrisGameBoard.count, 0);
+            // known issue : bot spams harddrop once detected 21th row has blocks (y axis increases by 1 upon spawn piece collides with minoes below)
             isEnded = false;
             string resultpath = Marshal.PtrToStringAnsi(path);
-            //Console.WriteLine(resultpath);
+            Console.WriteLine(resultpath);
             MoveResult moveResult = new MoveResult();
             foreach (char move in resultpath)
             {
@@ -232,7 +233,7 @@ namespace TETR.IO.Bot
                         }
                         break;
                     case 'd':
-                        _IOBoard.SonicDrop();
+                        _IOBoard.SoftDrop();
                         moveResult.moves.Add("SonicDrop");
                         break;
                     case 'D':
