@@ -33,6 +33,11 @@ namespace ScixingTetrisCore
             Stage++;
             Stage %= 4;
         }
+        public void _180Roll()
+        {
+            Stage += 2;
+            Stage %= 4;
+        }
         public void MoveLeft(int distance = 1)
         {
             _y -= distance;

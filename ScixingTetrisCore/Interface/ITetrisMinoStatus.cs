@@ -19,6 +19,8 @@ namespace ScixingTetrisCore.Interface
         void LeftRoll();
         void RightRoll();
 
+        void _180Roll();
+
         void MoveLeft(int distance = 1);
         void MoveRight(int distance = 1);
         void MoveBottom(int distance = 1);

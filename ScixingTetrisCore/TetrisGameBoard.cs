@@ -206,7 +206,7 @@ namespace ScixingTetrisCore
 
         public bool _180Rotation()
         {
-            throw new NotImplementedException();
+            return TetrisRule.RotationSystem._180Rotation(this, TetrisMinoStatus).isSuccess;
         }
 
         public bool MoveLeft()
