@@ -43,7 +43,8 @@ namespace ScixingTetrisCore
         public int B2B { get; set; }
         public int Combo { get; set; }
 
-        public (int X, int Y) DefaultPos = (20, 3); // known issue
+        public (int X, int Y) DefaultPos = (20, 3);
+        public (int X, int Y) NewPos = (21, 3);
         // 此处还欠考虑
         public TetrisGameBoard(int Width = 10, int Height = 40, int ShowHeight = 20, ITetrisRule tetrisRule = null, ITetrisMinoGenerator tetrisMinoGenerator = null)
         {
@@ -69,13 +70,29 @@ namespace ScixingTetrisCore
         }
         public int TryClearLines()
         {
+            switch (TetrisMinoStatus.TetrisMino.Name[0])
+            {
+                case 'S':
+                    IsMinoHeightIncreased = Field[20][3] != 0 || Field[20][4] != 0;
+                    break;
+                case 'L':
+                case 'J':
+                case 'T':
+                    IsMinoHeightIncreased = Field[20][3] != 0 || Field[20][4] != 0 || Field[20][5] != 0;
+                    break;
+                case 'O':
+                case 'Z':
+                    IsMinoHeightIncreased = Field[20][4] != 0 || Field[20][5] != 0;
+                    break;
+                case 'I':
+                    IsMinoHeightIncreased = Field[20][3] != 0 || Field[20][4] != 0 || Field[20][5] != 0 || Field[20][6] != 0;
+                    break;
+            }
             int cnt = 0;
             count = 0;
             // 限制一下搜索高度
             //List<int> clearidx = new List<int>();
             bool[] clearFlag = new bool[Height];
-            /*if (Field[20][4] != 0) IsMinoHeightIncreased = true; // might be the resolve of known issue but untested
-            else IsMinoHeightIncreased = false;*/
             for (int i = 0; i < Height; ++i)
             {
                 bool flag = true;
@@ -277,7 +294,7 @@ namespace ScixingTetrisCore
             {
                 (HoldMino, TetrisMinoStatus.TetrisMino) = (TetrisMinoStatus.TetrisMino, HoldMino);
                 //TetrisMinoStatus.Position = (19, 3);
-                TetrisMinoStatus.Position = DefaultPos;
+                TetrisMinoStatus.Position = IsMinoHeightIncreased ? NewPos : DefaultPos;
                 TetrisMinoStatus.Stage = 0;
             }
             return true;
@@ -288,7 +305,7 @@ namespace ScixingTetrisCore
             // 先简略来一个（ 后续要改 要考虑方块用什么 需不需要接口 要看看成不成功
             //TetrisMinoStatus = new TetrisMinoStatus { Position = (19, 3), Stage = 0, TetrisMino = TetrisMinoGenerator.GetNextMino() };
             //TetrisMinoStatus = new TetrisMinoStatus { Position = (19, 3), Stage = 0, TetrisMino = NextQueue.Dequeue() };
-            TetrisMinoStatus = new TetrisMinoStatus { Position = DefaultPos, Stage = 0, TetrisMino = NextQueue.Dequeue() };
+            TetrisMinoStatus = new TetrisMinoStatus { Position = IsMinoHeightIncreased ? NewPos : DefaultPos, Stage = 0, TetrisMino = NextQueue.Dequeue() };
 
             // 针对io 立即下降一格
             SoftDrop();
