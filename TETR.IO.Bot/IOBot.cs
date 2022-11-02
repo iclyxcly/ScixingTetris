@@ -38,7 +38,8 @@ namespace TETR.IO.Bot
     {
         static Queue<MinoType> _nextQueue = new();
         static TetrisGameBoard _IOBoard = new(ShowHeight: TetrisGameBoard.IsMinoHeightIncreased ? 22 : 21); // 调了这里和TetrisAI的y轴还是选择自杀，可能跟field有关（？
-        static int _garbage = 0, pieces, now, round, vv, changeHold = 1, changePPS;
+        static int _garbage = 0, pieces, now, round, vv, changeHold = 1;
+        static double changePPS;
         static bool isEnded, IsEnded, isMinoHeightIncreased;
         static object _lockQueue = new();
         static object _lockBoard = new();
@@ -108,7 +109,7 @@ namespace TETR.IO.Bot
             });
             Post("/changePPS", async (req, res) =>
             {
-                changePPS = await req.Bind<int>();
+                changePPS = await req.Bind<double>();
             });
             Post("/changeHold", async (req, res) =>
             {
