@@ -38,7 +38,7 @@ namespace TETR.IO.Bot
     {
         static Queue<MinoType> _nextQueue = new();
         static TetrisGameBoard _IOBoard = new(ShowHeight: TetrisGameBoard.IsMinoHeightIncreased ? 22 : 21); // 调了这里和TetrisAI的y轴还是选择自杀，可能跟field有关（？
-        static int _garbage = 0, pieces, now, round, vv, changeHold = 1;
+        static int _garbage = 0, pieces, now, round, vv, changeHold = 1, changeBurst = 1, changePC = 1;
         static double changePPS;
         static bool isEnded, IsEnded, isMinoHeightIncreased;
         static object _lockQueue = new();
@@ -114,6 +114,14 @@ namespace TETR.IO.Bot
             Post("/changeHold", async (req, res) =>
             {
                 changeHold = await req.Bind<int>();
+            });
+            Post("/changeBurst", async (req, res) =>
+            {
+                changeBurst = await req.Bind<int>();
+            });
+            Post("/changePC", async (req, res) =>
+            {
+                changePC = await req.Bind<int>();
             });
         }
 
@@ -218,7 +226,7 @@ namespace TETR.IO.Bot
             // 写了个判定BOT还是选择狂按硬降...
             var path = ZZZTOJCore.TetrisAI(field, 10, 22, _IOBoard.B2B,
                     _IOBoard.Combo, _IOBoard.NextQueue.Take(_botSetting.NextCnt + 1).Select(s => s.Name[0]).ToArray(), (_IOBoard.HoldMino == null ? ' ' : _IOBoard.HoldMino.Name[0]),
-                    true, _IOBoard.TetrisMinoStatus.TetrisMino.Name[0], 3, isMinoHeightIncreased ? 0 : 1, 0, changeHold == 0 ? false : true , true, garbage, new[] { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, -1 }, _botSetting.NextCnt, changePPS == 0 ? _botSetting.PPS : changePPS, IsEnded, TetrisGameBoard.count, 0);
+                    true, _IOBoard.TetrisMinoStatus.TetrisMino.Name[0], 3, isMinoHeightIncreased ? 0 : 1, 0, changeHold == 0 ? false : true , true, garbage, new[] { 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, -1 }, _botSetting.NextCnt, changePPS == 0 ? _botSetting.PPS : changePPS, changeBurst == 0 ? false : true, changePC == 0 ? false : true, IsEnded, TetrisGameBoard.count, 0);
             // known issue : bot spams harddrop once detected 21th row has blocks (y axis increases by 1 upon spawn piece collides with minoes below)
             string resultpath = Marshal.PtrToStringAnsi(path);
             ++pieces;

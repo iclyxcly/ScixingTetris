@@ -11,6 +11,6 @@ namespace TETR.IO.Bot
         [DllImport("zzztoj_io_dll.dll")]
         public static extern IntPtr TetrisAI(int[] field, int field_w, int field_h, int b2b, int combo,
             char[] next, char hold, bool curCanHold, char active, int x, int y, int spin,
-            bool canhold, bool can180spin, int upcomeAtt, int[] comboTable, int maxDepth, double pps, bool isEnded, int boardfill, int player);
+            bool canhold, bool can180spin, int upcomeAtt, int[] comboTable, int maxDepth, double pps, bool burst, bool pc, bool isEnded, int boardfill, int player);
     }
 }
