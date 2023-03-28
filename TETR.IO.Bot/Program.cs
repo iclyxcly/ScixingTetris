@@ -12,6 +12,7 @@ namespace TETR.IO.Bot
 {
     public class Program
     {
+        static BotSetting getPort = new();
         public static void Main(string[] args)
         {
             var options = new JsonSerializerOptions
@@ -22,6 +23,7 @@ namespace TETR.IO.Bot
             {
                 System.IO.File.WriteAllText("TetrSetting.json", JsonSerializer.Serialize(new BotSetting(), options));
             }
+            getPort = JsonSerializer.Deserialize<BotSetting>(System.IO.File.ReadAllText("TetrSetting.json"));
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -30,7 +32,7 @@ namespace TETR.IO.Bot
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://*:47326");
+                    webBuilder.UseUrls("http://*:" + getPort.NET_PORT);
                 });
     }
 }

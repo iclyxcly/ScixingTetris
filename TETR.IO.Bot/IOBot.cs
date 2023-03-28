@@ -31,6 +31,7 @@ namespace TETR.IO.Bot
 
     public class BotSetting
     {
+        public int NET_PORT { get; set; } = 47326;
         public int NextCnt { get; set; } = 6;
         public double PPS { get; set; } = 3;
     }
